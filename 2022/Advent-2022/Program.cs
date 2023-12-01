@@ -1,6 +1,6 @@
 ﻿List<string> data = File.ReadAllLines("1.txt").ToList();
 
-int maximum = 0;
+List<int> summary = new();
 int tempMax = 0;
 string lastItem = string.Empty;
 
@@ -8,7 +8,7 @@ foreach (string item in data)
 {
     if (item.Equals(string.Empty))
     {
-        maximum = maximum < tempMax ? tempMax : maximum;
+        summary.Add(tempMax);
         tempMax = 0;
         continue;
     }
@@ -17,8 +17,11 @@ foreach (string item in data)
     lastItem = item;
 }
 
-tempMax += int.Parse(lastItem);
-maximum = maximum < tempMax ? tempMax : maximum;
+summary.Add(tempMax);
 
-Console.WriteLine(maximum);
+IOrderedEnumerable<int> orderedResults = summary.OrderDescending();
+
+int results = orderedResults.Take(3).Sum();
+
+Console.WriteLine(results);
 Console.Read();
