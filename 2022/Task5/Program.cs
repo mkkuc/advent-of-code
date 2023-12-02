@@ -36,11 +36,8 @@ foreach (string line in data)
         int from = int.Parse(split[3]) - 1;
         int to = int.Parse(split[5]) - 1;
 
-        string? candidateToMove = positions[from].Substring(0, move);
-        char[] charArray = candidateToMove.ToCharArray();
-        Array.Reverse(charArray);
-        var toMove = new string(charArray);
-        positions[to] = toMove + positions[to];
+        string candidateToMove = positions[from].Substring(0, move);
+        positions[to] = candidateToMove + positions[to];
         positions[from] = positions[from].Substring(move, positions[from].Length - move);
     }
     else
