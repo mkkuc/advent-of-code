@@ -9,7 +9,7 @@ foreach (var line in data)
         if (!pack.Contains(line[i]))
         {
             pack += line[i];
-            if (pack.Length == 4)
+            if (pack.Length == 14)
             {
                 Console.WriteLine(i + 1);
                 break;
