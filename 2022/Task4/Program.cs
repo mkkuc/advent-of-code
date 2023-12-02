@@ -14,11 +14,19 @@ foreach (string line in data)
     int end1 = int.Parse(endRange.Split('-')[0]);
     int end2 = int.Parse(endRange.Split('-')[1]);
 
-    if (start1 <= end1 && start2 >= end2)
+    if (start1 >= end1 && start1 <= end2)
     {
         result++;
     }
-    else if (end1 <= start1 && end2 >= start2)
+    else if (start2 >= end1 && start2 <= end2)
+    {
+        result++;
+    }
+    else if (end1 >= start1 && end1 <= start2 )
+    {
+        result++;
+    }
+    else if (end2 >= start1 && end2 <= start2)
     {
         result++;
     }
