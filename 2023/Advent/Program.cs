@@ -1,5 +1,4 @@
-﻿Console.WriteLine("Hello, World!");
-List<string> input = File.ReadAllLines("1.txt").ToList();
+﻿List<string> input = File.ReadAllLines("1.txt").ToList();
 
 int result = 0;
 
