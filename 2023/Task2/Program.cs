@@ -14,17 +14,17 @@ foreach (string line in input)
     string[] splittedLine = line.Split(':');
     string[] game = splittedLine[0].Split(' ');
     int gameId = int.Parse(game[1]);
-
     string[] sets = splittedLine[1].Remove(0, 1).Split("; ");
-    bool isPossible = true;
+
+    Dictionary<string, int> gameDictionary = new()
+    {
+        { "red", 0 },
+        { "green", 0 },
+        { "blue", 0 }
+    };
 
     foreach (string set in sets)
     {
-        if (!isPossible)
-        {
-            break;
-        }
-
         string[] splitCubes = set.Split(", ");
 
         foreach (string cubes in splitCubes)
@@ -33,19 +33,18 @@ foreach (string line in input)
             int number = int.Parse(cube[0]);
             string color = cube[1];
 
-            if (dictionary.GetValueOrDefault(color) < number)
-            {
-                isPossible = false;
-                break;
-            }
+            int maximum = int.Max(gameDictionary.GetValueOrDefault(color), number);
+
+            gameDictionary.Remove(color);
+            gameDictionary.Add(color, maximum);
         }
     }
 
-    if (isPossible)
-    {
-        result += gameId;
-        isPossible = true;
-    } 
+    var red = gameDictionary["red"];
+    var green = gameDictionary["green"];
+    var blue = gameDictionary["blue"];
+
+    result += (red * green * blue);
 }
 
 Console.WriteLine(result);
