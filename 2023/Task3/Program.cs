@@ -5,223 +5,333 @@ for (int row = 0; row < input.Count; row++)
 {
     string line = input[row];
     int lastColumn = line.Length - 1;
-    int start = -1;
-    int end = -1;
     string number = string.Empty;
-    Console.WriteLine(row + 1);
     for (int column = 0; column < line.Length; column++)
     {
         string character = line[column].ToString();
 
-        if (int.TryParse(character, out _))
+        if (character.Equals("*"))
         {
-            end = column;
-            if (number.Equals(string.Empty))
+            List<Number> numbersToMultiplying = FindNumbersToMultiplying(row, column, lastColumn);
+            if (numbersToMultiplying.Count == 2)
             {
-                start = column;
+                Console.WriteLine($"{row + 1}: {numbersToMultiplying[0].ToString()} {numbersToMultiplying[1].ToString()}");
+                result += (numbersToMultiplying[0].Value * numbersToMultiplying[1].Value);
             }
-            number += character;
-            if (!number.Equals(string.Empty) && column == lastColumn)
-            {
-                Console.Write($"{number} ");
-                if (IsNumberAdjacentToSymbol(start, end, row, lastColumn, number.Length))
-                {
-                    Console.Write(true);
-                    result += int.Parse(number);
-                }
-                else
-                {
-                    Console.Write(false);
-                }
-
-                Console.WriteLine();
-                number = string.Empty;
-                start = -1;
-                end = -1;
-            }
-        }
-        else if (!number.Equals(string.Empty))
-        {
-            Console.Write($"{number} ");
-            if (IsNumberAdjacentToSymbol(start, end, row, lastColumn, number.Length))
-            {
-                Console.Write(true);
-                result += int.Parse(number);
-            }
-            else
-            {
-                Console.Write(false);
-            }
-            
-            Console.WriteLine();
-            number = string.Empty;
-            start = -1;
-            end = -1;
         }
     }
 }
 
 Console.WriteLine(result);
 
-bool IsNumberAdjacentToSymbol(int start, int end, int currentRow, int lastColumn, int numberSize)
+List<Number> FindNumbersToMultiplying(int row, int column, int lastColumn)
 {
-    if (currentRow == 0)
+    List<Number> numbers = new List<Number>();
+    if (row > 0 && column < lastColumn)
     {
-        if (start == 0 && end != lastColumn)
+        if (int.TryParse(input[row - 1][column - 1].ToString(), out _))
         {
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkBottom = input[currentRow + 1].Substring(start, numberSize + 1);
-
-            if (ContainsSymbol(checkRight) || ContainsSymbol(checkBottom))
+            Number tempNumber = GetNumber(row - 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start != 0 && end == lastColumn)
+        if (int.TryParse(input[row - 1][column].ToString(), out _))
         {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkBottom = input[currentRow + 1].Substring(start - 1, numberSize + 1);
-
-            if (ContainsSymbol(checkLeft) || ContainsSymbol(checkBottom))
+            Number tempNumber = GetNumber(row - 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start != 0 && end != lastColumn)
+        if (int.TryParse(input[row - 1][column + 1].ToString(), out _))
         {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkBottom = input[currentRow + 1].Substring(start - 1, numberSize + 2);
-
-            if (ContainsSymbol(checkBottom) 
-                || ContainsSymbol(checkLeft) 
-                || ContainsSymbol(checkRight))
+            Number tempNumber = GetNumber(row - 1, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start == 0 && end == lastColumn)
-        {
-            var checkBottom = input[currentRow + 1];
 
-            if (ContainsSymbol(checkBottom))
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row][column + 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row + 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row + 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row + 1][column + 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
             }
         }
     }
-    else if (currentRow == input.Count - 1)
+    else if (row == 0 && column < lastColumn)
     {
-        if (start == 0 && end != lastColumn)
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
         {
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start, numberSize + 1);
-
-            if (ContainsSymbol(checkRight) || ContainsSymbol(checkTop))
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start != 0 && end == lastColumn)
+        if (int.TryParse(input[row][column + 1].ToString(), out _))
         {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start - 1, numberSize + 1);
-
-            if (ContainsSymbol(checkLeft) || ContainsSymbol(checkTop))
+            Number tempNumber = GetNumber(row, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start != 0 && end != lastColumn)
-        {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start - 1, numberSize + 2);
 
-            if (ContainsSymbol(checkTop)
-                || ContainsSymbol(checkLeft)
-                || ContainsSymbol(checkRight))
+        if (int.TryParse(input[row + 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
-        else if (start == 0 && end == lastColumn)
+        if (int.TryParse(input[row + 1][column].ToString(), out _))
         {
-            var checkTop = input[currentRow - 1];
-
-            if (ContainsSymbol(checkTop))
+            Number tempNumber = GetNumber(row + 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
             {
-                return true;
+                numbers.Add(tempNumber);
             }
         }
+        if (int.TryParse(input[row + 1][column + 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+    }
+    else if (row == input.Count - 1 && column < lastColumn)
+    {
+        if (int.TryParse(input[row - 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row - 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row - 1][column + 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row][column + 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column + 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+    }
+    else if (row > 0 && column == lastColumn)
+    {
+        if (int.TryParse(input[row - 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row - 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row + 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row + 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+    }
+    else if (row == 0 && column == lastColumn)
+    {
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row + 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row + 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row + 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+    }
+    else if (row == input.Count - 1 && column == lastColumn)
+    {
+        if (int.TryParse(input[row - 1][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+        if (int.TryParse(input[row - 1][column].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row - 1, column);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+
+        if (int.TryParse(input[row][column - 1].ToString(), out _))
+        {
+            Number tempNumber = GetNumber(row, column - 1);
+            if (!numbers.Exists(n => n.Value == tempNumber.Value && n.X == tempNumber.X && n.Y == tempNumber.Y))
+            {
+                numbers.Add(tempNumber);
+            }
+        }
+    }
+
+    return numbers;
+}
+
+Number GetNumber(int x, int y)
+{
+    string line = input[x];
+    string number = string.Empty;
+    int startPosition = y;
+
+    if (startPosition == 0)
+    {
+        while (int.TryParse(line[y].ToString(), out _))
+        {
+            number += line[y];
+            y++;
+        }
+        return new Number(int.Parse(number), x, startPosition);
+    }
+
+    while (y > 0 && int.TryParse(line[y].ToString(), out _))
+    {
+        y--;
+    }
+
+    if (y == 0 && int.TryParse(line[y].ToString(), out _))
+    {
+        startPosition = y;
     }
     else
     {
-        if (start == 0 && end != lastColumn)
-        {
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start, numberSize + 1);
-            var checkBottom = input[currentRow + 1].Substring(start, numberSize + 1);
-
-            if (ContainsSymbol(checkRight) 
-                || ContainsSymbol(checkTop)
-                || ContainsSymbol(checkBottom))
-            {
-                return true;
-            }
-        }
-        else if (start != 0 && end == lastColumn)
-        {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start - 1, numberSize + 1);
-            var checkBottom = input[currentRow + 1].Substring(start - 1, numberSize + 1);
-
-            if (ContainsSymbol(checkLeft) 
-                || ContainsSymbol(checkTop)
-                || ContainsSymbol(checkBottom))
-            {
-                return true;
-            }
-        }
-        else if (start != 0 && end != lastColumn)
-        {
-            var checkLeft = input[currentRow][start - 1].ToString();
-            var checkRight = input[currentRow][end + 1].ToString();
-            var checkTop = input[currentRow - 1].Substring(start - 1, numberSize + 2);
-            var checkBottom = input[currentRow + 1].Substring(start - 1, numberSize + 2);
-
-            if (ContainsSymbol(checkTop)
-                || ContainsSymbol(checkLeft)
-                || ContainsSymbol(checkRight)
-                || ContainsSymbol(checkBottom))
-            {
-                return true;
-            }
-        }
-        else if (start == 0 && end == lastColumn)
-        {
-            var checkTop = input[currentRow - 1];
-            var checkBottom = input[currentRow - 1];
-
-            if (ContainsSymbol(checkTop) || ContainsSymbol(checkBottom))
-            {
-                return true;
-            }
-        }
+        y++;
+        startPosition = y;
     }
-
-    return false;
+    
+    while (y < line.Length && int.TryParse(line[y].ToString(), out _))
+    {
+        number += line[y];
+        y++;
+    }
+    return new Number(int.Parse(number), x, startPosition);
 }
 
-bool ContainsSymbol(string stringToCheck)
+record Number(int Value, int X, int Y)
 {
-    for (int i = 0; i < stringToCheck.Length; i++)
+    public override string ToString()
     {
-        if (!stringToCheck[i].Equals('.') && !int.TryParse(stringToCheck[i].ToString(), out _))
-        {
-            return true;
-        }
+        return $"{Value} {X} {Y}";
     }
-
-    return false;
 }
