@@ -1,153 +1,63 @@
-﻿
+﻿using Task5;
 
+using FileStream inputStream = File.OpenRead("5.txt");
+using StreamReader reader = new(inputStream);
 
-List<string> input = File.ReadAllLines("5.txt").ToList();
+string seedsLine = reader.ReadLine()!.Split("seeds:")[1];
+long[] seedPairs = seedsLine.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    .Select(long.Parse)
+    .ToArray();
 
-long[] seeds;
-long[,] seedsToSoil;
-long[,] soilToFertilizer;
-long[,] fertilizerToWater;
-long[,] waterToLight;
-long[,] lightToTemperature;
-long[,] temperatureToHumidity;
-long[,] humidityToLocation;
+reader.ReadLine();
 
-long result = long.MaxValue;
+List<RangeGroup> mapGroups = new();
+CreateRanges();
 
-seeds = GetSeeds(input);
+List<ItemRange> seeds = new();
+CreateSeedPairs();
 
-seedsToSoil = GetAlfaToOmega(input);
-soilToFertilizer = GetAlfaToOmega(input);
-fertilizerToWater = GetAlfaToOmega(input);
-waterToLight = GetAlfaToOmega(input);
-lightToTemperature = GetAlfaToOmega(input);
-temperatureToHumidity = GetAlfaToOmega(input);
-humidityToLocation = GetAlfaToOmega(input);
-
-foreach(var seed in seeds)
+List<ItemRange> seedRanges = seeds;
+foreach (RangeGroup group in mapGroups)
 {
-    result = long.Min(result, CheckSeed(seed));
+    List<ItemRange> newSeedRanges = new();
+
+    foreach (ItemRange seedRange in seedRanges)
+    {
+        ItemRange[] mappedRanges = group.Map(seedRange);
+        newSeedRanges.AddRange(mappedRanges);
+    }
+
+    seedRanges = newSeedRanges;
 }
 
+var result = seedRanges.Select(s => s.Start).Min();
 Console.WriteLine(result);
 
-long CheckSeed(long seed)
+void CreateRanges()
 {
-    long destinationValue = GetDestinationValue(seed, seedsToSoil);
-    destinationValue = GetDestinationValue(destinationValue, soilToFertilizer);
-    destinationValue = GetDestinationValue(destinationValue, fertilizerToWater);
-    destinationValue = GetDestinationValue(destinationValue, waterToLight);
-    destinationValue = GetDestinationValue(destinationValue, lightToTemperature);
-    destinationValue = GetDestinationValue(destinationValue, temperatureToHumidity);
-    destinationValue = GetDestinationValue(destinationValue, humidityToLocation);
-
-    return destinationValue;
-}
-
-long GetDestinationValue(long seed, long[,] array2D)
-{
-    long numRows = array2D.GetLength(0);
-    long numCols = array2D.GetLength(1);
-
-    for (long i = 0; i < numRows; i++)
+    for (long i = 0; i < 7; i++)
     {
-        var destination = array2D[i,0];
-        var source = array2D[i, 1];
-        var length = array2D[i, 2];
+        reader.ReadLine();
 
-        if (seed >= source && seed <= source + length - 1)
+        List<MapOfRange> maps = new();
+        string? line = reader.ReadLine();
+        while (!string.IsNullOrEmpty(line))
         {
-            var diff = destination - source;
-            var value = seed + diff;
-
-            return value;
+            long[] parts = line.Split(' ').Select(long.Parse).ToArray();
+            maps.Add(new MapOfRange(parts[0], parts[1], parts[2]));
+            line = reader.ReadLine();
         }
-    }
 
-    return seed;
+        RangeGroup seedRangeGroup = new(maps.ToArray());
+        mapGroups.Add(seedRangeGroup);
+    }
 }
-
-long[,] GetAlfaToOmega(List<string> input)
+void CreateSeedPairs()
 {
-    int iterator = 0;
-    var result = new List<List<long>>();
-    input.RemoveAt(iterator);
-    while (input.Count != 0 && input[iterator].Length != 0)
+    for (int i = 0; i < seedPairs.Length / 2; i++)
     {
-        var splitted = input[iterator].Split(" ");
-        var list = new List<long>();
-        for (long i = 0; i < splitted.Length; i++)
-        {
-            list.Add(long.Parse(splitted[i]));
-        }
-        result.Add(list);
-        input.RemoveAt(iterator);
+        long startingSeed = seedPairs[i * 2];
+        long length = seedPairs[i * 2 + 1];
+        seeds.Add(new(startingSeed, length));
     }
-    
-    if(input.Count != 0)
-    {
-        input.RemoveAt(iterator);
-    }
-
-    return ConvertListToArray2D(result);
-}
-
-long[] GetSeeds(List<string> input)
-{
-    int iterator = 0;
-    var splitted = input[0].Split(" ");
- 
-    var result = new List<long>();
-    for (long i = 1; i < splitted.Length; i++)
-    {
-        result.Add(long.Parse(splitted[i]));
-    }
-    input.RemoveAt(iterator);
-    input.RemoveAt(iterator);
-
-    return result.ToArray();
-}
-
-static long[,] ConvertListToArray2D(List<List<long>> list2D)
-{
-    long numRows = list2D.Count;
-    long numCols = list2D[0].Count;
-
-    long[,] array2D = new long[numRows, numCols];
-
-    for (int i = 0; i < numRows; i++)
-    {
-        for (int j = 0; j < numCols; j++)
-        {
-            array2D[i, j] = list2D[i][j];
-        }
-    }
-
-    return array2D;
-}
-
-static void Show1DArray(long[] array1D)
-{
-    for (long i = 0; i < array1D.Length; i++)
-    {
-        Console.Write(array1D[i] + " ");
-    }
-    Console.WriteLine();
-    Console.WriteLine();
-}
-
-static void Show2DArray(long[,] array2D)
-{
-    long numRows = array2D.GetLength(0);
-    long numCols = array2D.GetLength(1);
-
-    for (long i = 0; i < numRows; i++)
-    {
-        for (long j = 0; j < numCols; j++)
-        {
-            Console.Write(array2D[i, j] + " ");
-        }
-        Console.WriteLine();
-    }
-    Console.WriteLine();
 }
